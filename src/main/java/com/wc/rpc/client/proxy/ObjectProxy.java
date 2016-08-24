@@ -29,8 +29,8 @@ public class ObjectProxy <T> implements InvocationHandler, IAsyncObjectProxy{
     public RPCFuture call(String funcName, Object... args) {
         RpcClientHandler handler = ConnectionManager.getInstance().chooseHandler(); //随意选取一个，使用RoundRobin
         RpcRequest request = createRequest(this.clazz.getName(), funcName, args);
-        RPCFuture future = handler.sendRequest(request);
-        return future;
+        RPCFuture rpcFuture = handler.sendRequest(request);
+        return rpcFuture;
     }
 
     @Override
