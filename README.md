@@ -34,9 +34,9 @@ public class HelloServiceImpl implements HelloService {
 3. Run the ServerBootStrap with Zookeeper
 4. Run a client
 ```java
-    public void helloTest1() {
-        HelloService helloService = rpcClient.create(HelloService.class);
-        String res = helloService.hello("Wangcheng");
-        System.out.println(res);
-    }
+public void helloTest1() {
+    HelloService helloService = rpcClient.create(HelloService.class);
+    String res = helloService.hello("Wangcheng");
+    System.out.println(res);
+}
 ```
