@@ -17,7 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**通过ConnectionManager实现了对InetSocketAddress以及对应的RpcCleintHandler的管理，建立了长连接
+/**
+ * 通过ConnectionManager实现了对InetSocketAddress以及对应的RpcCleintHandler的管理，建立了长连接
  * Created by 12083 on 2016/8/23.
  */
 public class ConnectionManager {
@@ -110,15 +111,20 @@ public class ConnectionManager {
             @Override
             public void run() {
                 Bootstrap b = new Bootstrap();
-                b.group(eventLoopGroup).channel(NioSocketChannel.class)
+                b.group(eventLoopGroup)
+                        .channel(NioSocketChannel.class)
                         .handler(new RpcClientInitializer());
-                final ChannelFuture future = b.connect(socketAddress);
-                future.addListener(new ChannelFutureListener() {
+
+                ChannelFuture channelFuture = b.connect(socketAddress);
+                //System.out.println("+++++++++++++++++" + future.channel().pipeline().get(RpcClientHandler.class).getRemotePeer());
+                channelFuture.addListener(new ChannelFutureListener() {
                     @Override
-                    public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                        LOGGER.debug("successful connect to remote server " + socketAddress);
-                        RpcClientHandler handler = future.channel().pipeline().get(RpcClientHandler.class);
-                        addHandler(handler);
+                    public void operationComplete(final ChannelFuture channelFuture) throws Exception {
+                        if (channelFuture.isSuccess()) { //成功的话才将其添加到addr与Handler对应的列表中去
+                            LOGGER.debug("successful connect to remote server " + socketAddress);
+                            RpcClientHandler handler = channelFuture.channel().pipeline().get(RpcClientHandler.class);
+                            addHandler(handler);
+                        }
                     }
                 });
             }
@@ -130,7 +136,7 @@ public class ConnectionManager {
      */
     private void addHandler(RpcClientHandler handler) {
         connectedHandlers.add(handler);
-        InetSocketAddress remoteAddress = (InetSocketAddress) handler.getRemotePeer();
+        InetSocketAddress remoteAddress = (InetSocketAddress) handler.getChannel().remoteAddress();
         connectedServerNodes.put(remoteAddress, handler);
         signalAvailiableHandler();
     }

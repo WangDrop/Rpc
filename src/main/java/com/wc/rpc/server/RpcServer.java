@@ -30,7 +30,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by 12083 on 2016/8/23.
+ * 初始化Bean之后进行下面的操作
+ * Created by WC on 2016/8/23.
  */
 public class RpcServer implements ApplicationContextAware, InitializingBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcServer.class);
