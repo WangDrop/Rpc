@@ -8,7 +8,7 @@
 - Simple code, and also simple to Use
 
 # Usage
-1. Define a Interface
+1.Define a Interface
 ```java
 public interface HelloService {
     String hello(String name);
@@ -16,7 +16,7 @@ public interface HelloService {
 }
 ```
 
-2. Mark the impl with annotation @RpcService
+2.Mark the impl with annotation @RpcService
 ```java
 @RpcService(HelloService.class)
 public class HelloServiceImpl implements HelloService {
@@ -30,9 +30,9 @@ public class HelloServiceImpl implements HelloService {
     }
 }
 ```
+3.Run the ServerBootStrap with Zookeeper
 
-3. Run the ServerBootStrap with Zookeeper
-4. Run a client
+4.Run a client
 ```java
 public void helloTest1() {
     HelloService helloService = rpcClient.create(HelloService.class);
