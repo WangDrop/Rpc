@@ -67,7 +67,7 @@ public class ServiceDiscovery {
                 @Override
                 public void process(WatchedEvent event) {
                     if (event.getType() == Event.EventType.NodeDataChanged)
-                        watchNode(zk);
+                        watchNode(zk); //由于watch是一次性触发的，所以需要再次再次进行观察
                 }
             });
             List<String> dataList = new ArrayList<>();
