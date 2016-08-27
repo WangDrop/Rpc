@@ -33,6 +33,7 @@ public class RPCFuture implements Future<Object> {
     private ReentrantLock lock = new ReentrantLock();
 
     public RPCFuture(RpcRequest request) {
+        
         this.sync = new Sync();
         this.request = request;
         this.startTime = System.currentTimeMillis();
