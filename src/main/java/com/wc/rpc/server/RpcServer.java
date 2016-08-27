@@ -96,7 +96,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
             String[] array = serverAddress.split(":");
             String host = array[0];
             int port = Integer.parseInt(array[1]);
-
+            System.out.println("bind on " + host + " : " + port);
             ChannelFuture future = bootstrap.bind(host, port).sync();
             LOGGER.debug("Server started on port {}", port);
 

@@ -19,4 +19,14 @@
         <constructor-arg name="serverAddress" value="127.0.0.1:18866"/>
         <constructor-arg name="serviceRegistry" ref="serviceRegistry"/>
     </bean>
+
+    <bean id="rpcServer2" class="com.wc.rpc.server.RpcServer">
+        <constructor-arg name="serverAddress" value="127.0.0.1:18867"/>
+        <constructor-arg name="serviceRegistry" ref="serviceRegistry"/>
+    </bean>
+
+    <bean id="rpcServer3" class="com.wc.rpc.server.RpcServer">
+        <constructor-arg name="serverAddress" value="127.0.0.1:18867"/>
+        <constructor-arg name="serviceRegistry" ref="serviceRegistry"/>
+    </bean>
 </beans>

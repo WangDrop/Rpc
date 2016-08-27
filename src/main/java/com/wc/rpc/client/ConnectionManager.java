@@ -51,6 +51,9 @@ public class ConnectionManager {
 
     public void updateConnectedServer(List<String> allServerAddress) {
         String arr[] = null;
+
+        System.out.println("The updated Connected Server size is " + allServerAddress.size());
+
         HashSet<InetSocketAddress> newServerAddrs = new HashSet<>();
         if (allServerAddress.size() > 0) {
             for (String addr : allServerAddress) {
@@ -116,13 +119,12 @@ public class ConnectionManager {
                         .handler(new RpcClientInitializer());
 
                 ChannelFuture channelFuture = b.connect(socketAddress);
-                //System.out.println("+++++++++++++++++" + future.channel().pipeline().get(RpcClientHandler.class).getRemotePeer());
                 channelFuture.addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(final ChannelFuture channelFuture) throws Exception {
                         if (channelFuture.isSuccess()) { //成功的话才将其添加到addr与Handler对应的列表中去
                             LOGGER.debug("successful connect to remote server " + socketAddress);
-                            RpcClientHandler handler = channelFuture.channel().pipeline().get(RpcClientHandler.class);
+                            RpcClientHandler handler = channelFuture.channel().pipeline().get(RpcClientHandler.class);//RpcClient handler 是在上面的添加RpcClientInitializer的时候指定的
                             addHandler(handler);
                         }
                     }
@@ -167,6 +169,10 @@ public class ConnectionManager {
 
     /**
      * 选择handler
+     * 注意一点，这里实现了简单的负载均衡，通过roudrobin
+     * 但是如果运行过程中服务突然下线的话，可能会因为zookeeper心跳检测
+     * 延时的原因导致没有unpate节点，使得用户得到的还是之前的服务器地址，这样
+     * 会导致连接失败，这种情况可以通过使用多次连接捕获异常的方式来处理
      */
     public RpcClientHandler chooseHandler() {
         CopyOnWriteArrayList<RpcClientHandler> handlers = (CopyOnWriteArrayList<RpcClientHandler>) connectedHandlers.clone();

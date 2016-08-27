@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created by 12083 on 2016/8/24.
@@ -69,6 +70,9 @@ public class HelloPersonCallbackTest {
         IAsyncObjectProxy proxy = RpcClient.createAsync(HelloService.class);
         try {
             final RPCFuture future = proxy.call("hello", "wangcheng");
+            //注意，下面添加回调函数的时候，是不会出现结果已经完成但是无法调用的情况的
+            //addCallBack会首先尝试去查看这个future是否是done的情况，如果是的话那么
+            //直接调用回调，当然，addCallBack的时候是会加锁的首先
             future.addCallback(new AsyncRPCCallback() {
                 @Override
                 public void success(Object result) {
