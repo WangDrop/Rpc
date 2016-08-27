@@ -6,6 +6,7 @@ import com.wc.rpc.client.RpcClient;
 import com.wc.rpc.client.proxy.IAsyncObjectProxy;
 import com.wc.rpc.registry.ServiceDiscovery;
 import com.wc.rpc.test.client.HelloPersonService;
+import com.wc.rpc.test.client.HelloService;
 import com.wc.rpc.test.client.Person;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by 12083 on 2016/8/24.
@@ -27,7 +29,7 @@ public class HelloPersonCallbackTest {
     RpcClient rpcClient;
 
     @Test
-    public void testCallBask() throws Exception{
+    public void testCallBask() throws Exception {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         try {
             IAsyncObjectProxy proxy = RpcClient.createAsync(HelloPersonService.class);
@@ -59,5 +61,34 @@ public class HelloPersonCallbackTest {
         }
         rpcClient.stop();
         System.out.println("End the process! ");
+    }
+
+    @Test
+    public void testCallBackHello() {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        IAsyncObjectProxy proxy = RpcClient.createAsync(HelloService.class);
+        try {
+            final RPCFuture future = proxy.call("hello", "wangcheng");
+            future.addCallback(new AsyncRPCCallback() {
+                @Override
+                public void success(Object result) {
+                    System.out.println("The result is " + result);
+                    countDownLatch.countDown();
+                }
+
+                @Override
+                public void fail(Exception e) {
+                    System.out.println(e);
+                    countDownLatch.countDown();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

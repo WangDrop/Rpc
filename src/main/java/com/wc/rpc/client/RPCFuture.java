@@ -45,7 +45,8 @@ public class RPCFuture implements Future<Object> {
 
     @Override
     public Object get() throws InterruptedException, ExecutionException {
-        sync.acquire(-1);
+        //sync.acquire(-1);
+        sync.acquire(1);
         if (this.response != null) {
             return this.response.getResult();
         } else {
@@ -55,7 +56,8 @@ public class RPCFuture implements Future<Object> {
 
     @Override
     public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        boolean success = sync.tryAcquireNanos(-1, unit.toNanos(timeout));
+        //boolean success = sync.tryAcquireNanos(-1, unit.toNanos(timeout));
+        boolean success = sync.tryAcquireNanos(1, unit.toNanos(timeout));
         if (success) {
             if (this.response != null) {
                 return this.response.getResult();
@@ -81,7 +83,7 @@ public class RPCFuture implements Future<Object> {
 
     public void done(RpcResponse reponse) {
         this.response = reponse;
-        sync.release(1);
+        sync.release(1);  //这里如果不release的话，那么对于多线程操作的话是不可行的，但是单线程的话由于锁是可重入的，所以可以一直执行。
         invokeCallbacks();
         // Threshold
         long responseTime = System.currentTimeMillis() - startTime;
