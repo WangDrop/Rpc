@@ -30,7 +30,6 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
     private Object handleRequest(RpcRequest request) throws Throwable {
         String className = request.getClassName();
-        System.out.println("class name  is " + className);
 
         Object serviceBean = handlerMap.get(className);
 

@@ -1,6 +1,7 @@
 package com.wc.rpc.client;
 
 
+import com.sun.corba.se.impl.orbutil.concurrent.Sync;
 import com.wc.rpc.protocol.RpcRequest;
 import com.wc.rpc.protocol.RpcResponse;
 import org.slf4j.Logger;
@@ -27,13 +28,12 @@ public class RPCFuture implements Future<Object> {
     private RpcResponse response;
     private long startTime;
 
-    private long responseTimeThreshold = 5000;
+    private long responseTimeThreshold = 100000000; //因为可能有很多的rpc请求，这个值可以相对的设置的大一点
 
     private List<AsyncRPCCallback> pendingCallbacks = new ArrayList<AsyncRPCCallback>();
     private ReentrantLock lock = new ReentrantLock();
 
     public RPCFuture(RpcRequest request) {
-
         this.sync = new Sync();
         this.request = request;
         this.startTime = System.currentTimeMillis();
@@ -46,7 +46,6 @@ public class RPCFuture implements Future<Object> {
 
     @Override
     public Object get() throws InterruptedException, ExecutionException {
-        //sync.acquire(-1);
         sync.acquire(1);
         if (this.response != null) {
             return this.response.getResult();
@@ -140,7 +139,9 @@ public class RPCFuture implements Future<Object> {
         private final int done = 1;
         private final int pending = 0;
 
-        protected boolean tryAcquire(int acquires) {
+        //这里代表了上面的acquire无论是什么都是无所谓的，因为实际上没有用到这个参数，客户端读取到状态为done的时候实际上
+        //就可以，无需再置位，现在执行get操作就是立即返回的了
+        protected boolean tryAcquire(int acquires) { //注意一点这里这个acquire参数无论是什么都无所谓，
             return getState() == done ? true : false;
         }
 

@@ -28,6 +28,8 @@ public class ConnectionManager {
     private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16, 600L,
             TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
     private CopyOnWriteArrayList<RpcClientHandler> connectedHandlers = new CopyOnWriteArrayList<>();
+
+    //这个map存在的原因是在updateNode的时候，需要根据SocketAddress来移除相应的RpcClienthandler
     private Map<InetSocketAddress, RpcClientHandler> connectedServerNodes = new ConcurrentHashMap<>();
 
     private ReentrantLock reentrantLock = new ReentrantLock();
@@ -177,12 +179,14 @@ public class ConnectionManager {
     public RpcClientHandler chooseHandler() {
         CopyOnWriteArrayList<RpcClientHandler> handlers = (CopyOnWriteArrayList<RpcClientHandler>) connectedHandlers.clone();
         int sz = handlers.size();
+        //int sz = connectedHandlers.size();
         while (isRunning && sz <= 0) {
             try {
                 boolean availiable = waitAvailiableHandler(); // 最多等待6S
                 if (availiable) {
                     handlers = (CopyOnWriteArrayList<RpcClientHandler>) connectedHandlers.clone();
                     sz = handlers.size();
+                    sz = connectedHandlers.size();
                 }
             } catch (InterruptedException e) {
                 LOGGER.debug("", e);
@@ -190,5 +194,6 @@ public class ConnectionManager {
         }
         int index = (rrNumber.getAndAdd(1) + sz) % sz; //从这里实现了负载均衡
         return handlers.get(index);
+        //return connectedHandlers.get(index);
     }
 }

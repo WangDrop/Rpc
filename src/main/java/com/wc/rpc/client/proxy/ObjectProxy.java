@@ -68,7 +68,7 @@ public class ObjectProxy <T> implements InvocationHandler, IAsyncObjectProxy{
         RpcClientHandler handler = ConnectionManager.getInstance().chooseHandler();
 
         RPCFuture rpcFuture = handler.sendRequest(request);
-        return rpcFuture.get();
+        return rpcFuture.get(); //这个acquire实际上是一个阻塞操作，客户端如果没有拿到Rpc响应的话会一直阻塞在这里
     }
 
     private RpcRequest createRequest(String className, String methodName, Object[] args) {
