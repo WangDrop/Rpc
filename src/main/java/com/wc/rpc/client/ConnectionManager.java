@@ -43,7 +43,7 @@ public class ConnectionManager {
 
     public static ConnectionManager getInstance() {
         if (connectionManager == null) {
-            synchronized (ConnectionManager.class) {
+            synchronized (ConnectionManager.class) {//DLC，双重检测加锁
                 if (connectionManager == null)
                     connectionManager = new ConnectionManager();
             }
@@ -53,8 +53,6 @@ public class ConnectionManager {
 
     public void updateConnectedServer(List<String> allServerAddress) {
         String arr[] = null;
-
-        System.out.println("The updated Connected Server size is " + allServerAddress.size());
 
         HashSet<InetSocketAddress> newServerAddrs = new HashSet<>();
         if (allServerAddress.size() > 0) {
@@ -192,7 +190,7 @@ public class ConnectionManager {
                 LOGGER.debug("", e);
             }
         }
-        int index = (rrNumber.getAndAdd(1) + sz) % sz; //从这里实现了负载均衡
+        int index = (rrNumber.getAndAdd(1) + sz) % sz; //从这里实现了简易的负载均衡
         return handlers.get(index);
         //return connectedHandlers.get(index);
     }

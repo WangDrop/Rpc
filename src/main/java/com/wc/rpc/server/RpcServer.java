@@ -64,11 +64,12 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        Map<String, Object> serviceBeanMap = applicationContext.getBeansWithAnnotation(RpcService.class);
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException { //这个实际上会在包下面进行扫描
+        Map<String, Object> serviceBeanMap = applicationContext.getBeansWithAnnotation(RpcService.class); // String是类简单名
+
         if (MapUtils.isNotEmpty(serviceBeanMap)) {
             for (Object serviceBean : serviceBeanMap.values()) {
-                String interfaceName = serviceBean.getClass().getAnnotation(RpcService.class).value().getName();
+                String interfaceName = serviceBean.getClass().getAnnotation(RpcService.class).value().getName(); //getType
                 handlerMap.put(interfaceName, serviceBean);
             }
         }

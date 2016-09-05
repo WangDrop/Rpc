@@ -73,7 +73,7 @@ public class ServiceDiscovery {
             List<String> dataList = new ArrayList<>();
             int sz = nodeList.size();
             for (int i = 0; i < sz; ++i) {
-                byte[] data = zk.getData(Constant.ZK_REGISTRY_PATH + "/" + nodeList.get(i), false, null);
+                byte[] data = zk.getData(Constant.ZK_REGISTRY_PATH + "/" + nodeList.get(i), false, null);//服务器的地址信息
                 if (data != null)
                     dataList.add(new String(data));
             }

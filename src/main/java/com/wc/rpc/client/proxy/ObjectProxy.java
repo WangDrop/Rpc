@@ -29,12 +29,13 @@ public class ObjectProxy <T> implements InvocationHandler, IAsyncObjectProxy{
     public RPCFuture call(String funcName, Object... args) {
         RpcClientHandler handler = ConnectionManager.getInstance().chooseHandler(); //随意选取一个，使用RoundRobin
         RpcRequest request = createRequest(this.clazz.getName(), funcName, args);
-        RPCFuture rpcFuture = handler.sendRequest(request);
+        RPCFuture rpcFuture = handler.sendRequest(request); //全局唯一的id在handler里面是有作用的
         return rpcFuture;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        //这些方法可以直接获得，所以可以从这里直接返回
         if (Object.class == method.getDeclaringClass()) {
             String name = method.getName();
             if ("equals".equals(name)) {
